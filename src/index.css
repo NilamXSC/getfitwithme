@@ -1,0 +1,243 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Theme (muted) & Typography ratios ===== */
+:root{
+  --bg:#0C0D10;
+  --surface:#12141A;
+  --ink:#E7EAEE;
+  --muted:#A3A8B3;
+  --accent:#9CC7BF;
+  --accent-2:#88B5D6;
+  --footer:#0F1216;
+
+  --h1-size: 60px;
+  --h1-lh: 60px;
+  --body-size: 16px;
+  --body-lh: 24px;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+.h1-hero { font-size: var(--h1-size); line-height: var(--h1-lh); font-weight: 900; letter-spacing:-0.02em; }
+.body    { font-size: var(--body-size); line-height: var(--body-lh); }
+.text-muted { color: var(--muted); }
+.bg-surface { background: var(--surface); }
+
+@media (max-width: 640px){
+  .h1-hero { font-size: clamp(36px, 9vw, 60px); line-height: 1; }
+}
+
+@layer components {
+  .shell   { @apply mx-auto max-w-7xl px-6; }
+  .section { @apply py-24; }
+
+  .card     { @apply rounded-2xl bg-surface border border-white/10; }
+  .card-pad { @apply p-6; }
+
+  .soft-shadow {
+    box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 hsla(0,0%,100%,.03);
+  }
+
+  .focus-ring { @apply outline-none ring-2 ring-accent/40 ring-offset-2 ring-offset-[var(--bg)]; }
+
+  .btn { @apply rounded-xl px-6 py-3 font-medium transition; min-height: 44px; }
+  .btn-solid { color:#000; background: var(--accent); }
+  .btn-outline { @apply border border-white/20 hover:bg-white/10; }
+
+  .avatar-circle {
+    @apply rounded-full overflow-hidden bg-surface;
+    width: clamp(140px, 28vw, 280px);
+    height: clamp(140px, 28vw, 280px);
+  }
+
+  .social { @apply inline-flex items-center justify-center h-10 w-10 rounded-full border border-white/10; }
+  .social:hover { background: rgba(255,255,255,.07); transform: translateY(-2px); transition: all .25s ease; }
+
+  /* === NEW: equal-height feature cards === */
+  .feature-card { @apply h-full flex flex-col overflow-hidden rounded-2xl; min-height: 360px; }
+  .feature-img  { flex: 0 0 auto; aspect-ratio: 4 / 3; }
+  .feature-img > img { @apply w-full h-full object-cover; }
+  .feature-body { @apply card-pad mt-auto; }
+
+  /* === NEW: subtle 3D bright glow on hover/active === */
+  .glow-3d {
+    transition: transform .35s cubic-bezier(.22,1,.36,1),
+                box-shadow .35s cubic-bezier(.22,1,.36,1),
+                filter .35s cubic-bezier(.22,1,.36,1);
+    will-change: transform, box-shadow, filter;
+  }
+  .glow-3d:hover {
+    transform: translateY(-4px) scale(1.03);
+    filter: brightness(1.08);
+    box-shadow:
+      0 16px 40px rgba(0,0,0,.45),
+      0 2px 10px rgba(0,0,0,.35),
+      0 0 0 1px rgba(255,255,255,.06),
+      0 10px 30px color-mix(in srgb, var(--accent-2) 22%, transparent),
+      0 0 60px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  .glow-3d:active {
+    transform: translateY(-1px) scale(1.015);
+    filter: brightness(1.04);
+    box-shadow:
+      0 10px 26px rgba(0,0,0,.45),
+      0 0 0 1px rgba(255,255,255,.06),
+      0 8px 24px color-mix(in srgb, var(--accent-2) 20%, transparent);
+  }
+}
+
+/* Mobile polish */
+* { -webkit-tap-highlight-color: transparent; }
+img, svg, video { max-width: 100%; height: auto; display: block; }
+
+/* === 3D Tilt card base === */
+.t3d {
+  --rx: 0deg;
+  --ry: 0deg;
+  --elev: 0px;
+  --mx: 50%;
+  --my: 50%;
+  transform-style: preserve-3d;
+  transition:
+    transform .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .35s cubic-bezier(.22,1,.36,1),
+    filter .35s cubic-bezier(.22,1,.36,1);
+  will-change: transform, box-shadow, filter;
+}
+.t3d:hover,
+.t3d:focus-within {
+  filter: brightness(1.06);
+  box-shadow:
+    0 16px 40px rgba(0,0,0,.45),
+    0 2px 10px rgba(0,0,0,.32),
+    0 0 0 1px rgba(255,255,255,.06),
+    0 10px 30px color-mix(in srgb, var(--accent-2) 22%, transparent),
+    0 0 60px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.t3d::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient( circle at var(--mx) var(--my),
+      rgba(255,255,255,.18),
+      rgba(255,255,255,.06) 22%,
+      transparent 55% );
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.t3d:hover::after,
+.t3d:focus-within::after { opacity: 1; }
+
+.t3d {
+  transform: perspective(900px)
+             rotateX(var(--rx))
+             rotateY(var(--ry))
+             translateZ(var(--elev));
+}
+
+/* Modal overlay + card */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+  z-index: 60;
+}
+.modal-card {
+  width: min(920px, calc(100vw - 2rem));
+  padding: 1.25rem;
+  border-radius: 1rem;
+}
+@media (min-width: 640px) {
+  .modal-card { padding: 1.5rem; }
+}
+
+/* ===== Dashboard layout & themes (page-scoped) ===== */
+.dash-page { min-height: 100vh; }
+
+.dash-theme-dark {
+  --dash-bg: #0C0D10;
+  --dash-panel: #12141A;
+  --dash-ink: #E7EAEE;
+  --dash-muted: #A3A8B3;
+}
+.dash-theme-light {
+  --dash-bg: #F7F9FB;
+  --dash-panel: #FFFFFF;
+  --dash-ink: #0C0D10;
+  --dash-muted: #5c6270;
+}
+.dash-theme-vibrant {
+  --dash-bg: #0B0E13;
+  --dash-panel: #0F1724;
+  --dash-ink: #F2FBFF;
+  --dash-muted: #9FD5FF;
+}
+
+.dash-page { background: var(--dash-bg); color: var(--dash-ink); }
+
+.dash-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+}
+@media (max-width: 1024px) {
+  .dash-layout { grid-template-columns: 1fr; }
+}
+
+.dash-side {
+  background: var(--dash-panel);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+.dash-side-head { padding: .25rem .25rem 1rem .25rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+.sign-btn {
+  display: flex; align-items: center; gap: .75rem;
+  width: 100%; padding: .5rem; border-radius: .75rem;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  transition: background .2s ease;
+}
+.sign-btn:hover { background: rgba(255,255,255,.06); }
+
+.dash-side-nav { padding-top: 1rem; display: grid; gap: 1rem; }
+.dash-group { display: grid; gap: .5rem; }
+.dash-label { font-size: .75rem; color: var(--dash-muted); text-transform: uppercase; letter-spacing: .06em; }
+
+.dash-link {
+  text-align: left; padding: .6rem .8rem; border-radius: .6rem;
+  background: transparent; border: 1px solid rgba(255,255,255,.06);
+  transition: background .2s ease, border-color .2s ease;
+}
+.dash-link:hover { background: rgba(255,255,255,.05); }
+.dash-link.active { border-color: var(--accent-2); }
+
+.dash-theme-row { display: flex; gap: .5rem; flex-wrap: wrap; }
+.chip {
+  padding: .35rem .6rem; border-radius: 999px; font-size: .8rem;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.04);
+}
+.chip-active { border-color: var(--accent-2); background: rgba(120,227,255,.14); }
+
+/* cards & inputs inside dashboard */
+.dash-main .card { background: var(--dash-panel); border-color: rgba(255,255,255,.08); }
+.metric-input, .input {
+  width: 100%; padding: .5rem .6rem; border-radius: .5rem;
+  border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.2);
+  color: var(--dash-ink);
+}
+.dash-main .text-muted { color: var(--dash-muted); }
